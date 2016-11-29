@@ -1,0 +1,28 @@
+{
+    "manifest_version": 2,
+
+    "name": "Move tabs with Ctrl+Shift hotkeys",
+    "description": "Move tabs with Ctrl/Cmd + Shift + Left/Right/Up/Down",
+    "version": "1.0",
+
+    "background": {
+        "scripts": ["bg.js"]
+    },
+
+    "browser_action": {
+        "default_icon": "arrow-right.png",
+        "default_title": "Ctrl+Shift+Move"
+    },
+    "commands": {
+        "toggle-tabs": {
+            "suggested_key": {
+                "default": "Ctrl+Space"
+            },
+            "description": "Toggle tabs"
+        }
+    },
+    "permissions": [
+        "activeTab",
+        "tabs"
+    ]
+}
