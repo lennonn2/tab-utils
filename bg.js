@@ -1,8 +1,16 @@
 var tabStack = [];
 
 chrome.commands.onCommand.addListener(function(command) {
-  if (command === 'toggle-tabs') {
-    chrome.tabs.update(tabStack[1], {active: true});
+  switch (command) {
+    case 'toggle-tabs':
+      chrome.tabs.update(tabStack[1], {active: true});
+      break;
+    case 'pop-tab-out':
+      popTabOut();
+      break;
+    case 'duplicate-tab':
+      duplicateTab();
+      break;
   }
 });
 
@@ -26,5 +34,24 @@ function removeIdFromArray(arr, id) {
       arr.splice(index, 1);
       return;
     }
-  })
+  });
+};
+
+function moveTab(dir) {
+  chrome.tabs.getSelected(function(tab) {
+    console.log(tab);
+    chrome.tabs.move(tab.id, {index: tab.index+dir});
+  });
+}
+
+function popTabOut() {
+  chrome.tabs.getSelected(function(tab) {
+    chrome.windows.create({tabId: tab.id, state: 'maximized'});
+  });
+}
+
+function duplicateTab() {
+  chrome.tabs.getSelected(function(tab) {
+    chrome.tabs.duplicate(tab.id);
+  });
 }
