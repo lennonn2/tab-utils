@@ -3,7 +3,7 @@
 
     "name": "Tab Utils",
     "description": "Toggle, duplicate and move tab to new window",
-    "version": "1.1.0",
+    "version": "1.1.1",
 
     "background": {
         "scripts": ["bg.js"]
@@ -32,7 +32,7 @@
           "suggested_key": {
               "default": "Ctrl+Shift+Down",
               "windows": "Ctrl+Shift+Down",
-              "mac": "MacCtrl+Shift+Down"
+              "mac": "Alt+Shift+Down"
           },
           "description": "Move tab into new window"
         },
