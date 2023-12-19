@@ -1,52 +1,46 @@
 {
-    "manifest_version": 2,
-
-    "name": "Tab Utils",
-    "description": "Toggle, duplicate and move tab to new window",
-    "version": "1.1.2",
-
-    "background": {
-        "scripts": ["bg.js"]
+  "manifest_version": 3,
+  "name": "Tab Utils",
+  "description": "Toggle, duplicate and move tab to new window",
+  "version": "1.1.4",
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+  "icons": {
+    "16": "tabs.png",
+    "48": "tabs.png",
+    "128": "tabs.png"
+  },
+  "commands": {
+    "toggle-tabs": {
+      "suggested_key": {
+        "default": "Alt+Q",
+        "windows": "Alt+Q",
+        "mac": "MacCtrl+Q"
+      },
+      "description": "Toggle tabs"
     },
-
-    "icons": {
-      "16": "tabs.png",
-      "48": "tabs.png",
-      "128": "tabs.png"
+    "pop-tab-out": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Down",
+        "windows": "Ctrl+Shift+Down",
+        "mac": "MacCtrl+Shift+Down"
+      },
+      "description": "Move tab into new window"
     },
-
-    "browser_action": {
-        "default_icon": "tabs.png",
-        "default_title": "Tab Utils"
-    },
-    "commands": {
-        "toggle-tabs": {
-            "suggested_key": {
-                "default": "Alt+Q",
-                "windows": "Alt+Q",
-                "mac": "Alt+Q"
-            },
-            "description": "Toggle tabs"
-        },
-        "pop-tab-out": {
-          "suggested_key": {
-              "default": "Ctrl+Shift+Down",
-              "windows": "Ctrl+Shift+Down",
-              "mac": "Alt+Shift+Down"
-          },
-          "description": "Move tab into new window"
-        },
-        "duplicate-tab": {
-          "suggested_key": {
-              "default": "Alt+D",
-              "windows": "Alt+D",
-              "mac": "Alt+D"
-          },
-          "description": "Duplicate tab"
-        }
-    },
-    "permissions": [
-        "activeTab",
-        "tabs"
-    ]
+    "duplicate-tab": {
+      "suggested_key": {
+        "default": "Alt+D",
+        "windows": "Alt+D",
+        "mac": "MacCtrl+D"
+      },
+      "description": "Duplicate tab"
+    }
+  },
+  "permissions": ["activeTab"],
+  "action": {
+    "default_icon": "tabs.png",
+    "default_title": "Tab Utils"
+  },
+  "content_security_policy": {}
 }
