@@ -37,7 +37,7 @@
       "description": "Duplicate tab"
     }
   },
-  "permissions": ["activeTab"],
+  "permissions": ["activeTab", "storage"],
   "action": {
     "default_icon": "tabs.png",
     "default_title": "Tab Utils"

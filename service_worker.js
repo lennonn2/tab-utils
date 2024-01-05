@@ -1,4 +1,4 @@
-var tabStack = {};
+chrome.storage.local.set({ tabStack: {} });
 
 chrome.commands.onCommand.addListener(function (command) {
   switch (command) {
@@ -15,28 +15,42 @@ chrome.commands.onCommand.addListener(function (command) {
 });
 
 chrome.tabs.onActivated.addListener(function (activeInfo) {
-  chrome.windows.getCurrent(function (window) {
+  chrome.windows.getCurrent(async function (window) {
+    const { tabStack } = await chrome.storage.local.get("tabStack");
+    const newTabStack = tabStack;
     if (!tabStack[window.id]) {
-      tabStack[window.id] = [];
+      newTabStack[window.id] = [];
+      chrome.storage.local.set({
+        tabStack: { ...tabStack, [window.id]: [] },
+      });
     }
-    var arr = removeIdFromArray(tabStack[window.id], activeInfo.tabId);
+    const arr = removeIdFromArray(newTabStack[window.id], activeInfo.tabId);
     arr.unshift(activeInfo.tabId);
-    tabStack[window.id] = arr;
+    chrome.storage.local.set({
+      tabStack: { ...tabStack, [window.id]: arr },
+    });
   });
 });
 
 chrome.tabs.onRemoved.addListener(function (tabId) {
-  chrome.windows.getCurrent(function (window) {
-    removeIdFromArray(tabStack[window.id], tabId);
+  chrome.windows.getCurrent(async function (window) {
+    const { tabStack } = await chrome.storage.local.get("tabStack");
+    const newArr = removeIdFromArray(tabStack[window.id], tabId);
+    chrome.storage.local.set({
+      tabStack: { ...tabStack, [window.id]: newArr },
+    });
   });
 });
 
-chrome.windows.onRemoved.addListener(function (window) {
+chrome.windows.onRemoved.addListener(async function (window) {
+  const { tabStack } = await chrome.storage.local.get("tabStack");
   delete tabStack[window];
+  chrome.storage.local.set({ tabStack: tabStack });
 });
 
 function toggleTabs() {
-  chrome.windows.getCurrent(function (window) {
+  chrome.windows.getCurrent(async function (window) {
+    const { tabStack } = await chrome.storage.local.get("tabStack");
     if (tabStack[window.id]) {
       chrome.tabs.update(tabStack[window.id][1], { active: true });
     }
