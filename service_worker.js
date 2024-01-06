@@ -1,5 +1,3 @@
-chrome.storage.local.set({ tabStack: {} });
-
 chrome.commands.onCommand.addListener(function (command) {
   switch (command) {
     case "toggle-tabs":
@@ -17,17 +15,20 @@ chrome.commands.onCommand.addListener(function (command) {
 chrome.tabs.onActivated.addListener(function (activeInfo) {
   chrome.windows.getCurrent(async function (window) {
     const { tabStack } = await chrome.storage.local.get("tabStack");
-    const newTabStack = tabStack;
-    if (!tabStack[window.id]) {
+    if (!tabStack) {
+      chrome.storage.local.set({ tabStack: {} });
+    }
+    const newTabStack = tabStack || {};
+    if (!newTabStack[window.id]) {
       newTabStack[window.id] = [];
       chrome.storage.local.set({
-        tabStack: { ...tabStack, [window.id]: [] },
+        tabStack: { ...newTabStack, [window.id]: [] },
       });
     }
     const arr = removeIdFromArray(newTabStack[window.id], activeInfo.tabId);
     arr.unshift(activeInfo.tabId);
     chrome.storage.local.set({
-      tabStack: { ...tabStack, [window.id]: arr },
+      tabStack: { ...newTabStack, [window.id]: arr },
     });
   });
 });
