@@ -12,35 +12,47 @@ chrome.commands.onCommand.addListener(function (command) {
   }
 });
 
-chrome.tabs.onActivated.addListener(function (activeInfo) {
-  chrome.windows.getCurrent(async function (window) {
+// Queue to process storage updates sequentially
+let storageQueue = Promise.resolve();
+
+// Function to ensure storage updates happen in sequence
+function queueStorageUpdate(updateFn) {
+  storageQueue = storageQueue.then(async () => {
     const { tabStack } = await chrome.storage.local.get("tabStack");
-    if (!tabStack) {
-      chrome.storage.local.set({ tabStack: {} });
-    }
-    const newTabStack = tabStack || {};
-    if (!newTabStack[window.id]) {
-      newTabStack[window.id] = [];
-      chrome.storage.local.set({
-        tabStack: { ...newTabStack, [window.id]: [] },
-      });
-    }
-    const arr = removeIdFromArray(newTabStack[window.id], activeInfo.tabId);
-    arr.unshift(activeInfo.tabId);
-    chrome.storage.local.set({
-      tabStack: { ...newTabStack, [window.id]: arr },
+    const newTabStack = updateFn(tabStack || {});
+    await chrome.storage.local.set({ tabStack: newTabStack });
+  });
+  return storageQueue;
+}
+
+chrome.tabs.onActivated.addListener(function (activeInfo) {
+
+  chrome.windows.getCurrent(function (window) {
+    queueStorageUpdate((tabStack) => {
+      if (!tabStack[window.id]) {
+        tabStack[window.id] = [];
+      }
+
+      const arr = removeIdFromArray(tabStack[window.id], activeInfo.tabId);
+      arr.unshift(activeInfo.tabId);
+      return { ...tabStack, [window.id]: arr };
     });
   });
+
 });
 
 chrome.tabs.onRemoved.addListener(function (tabId) {
-  chrome.windows.getCurrent(async function (window) {
-    const { tabStack } = await chrome.storage.local.get("tabStack");
-    const newArr = removeIdFromArray(tabStack[window.id], tabId);
-    chrome.storage.local.set({
-      tabStack: { ...tabStack, [window.id]: newArr },
+
+  chrome.windows.getCurrent(function (window) {
+    queueStorageUpdate((tabStack) => {
+      if (tabStack[window.id]) {
+        const newArr = removeIdFromArray(tabStack[window.id], tabId);
+        return { ...tabStack, [window.id]: newArr };
+      }
+      return tabStack;
     });
   });
+  
 });
 
 chrome.windows.onRemoved.addListener(async function (window) {
